@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-brand-50: oklch(0.97 0.014 254);
+  --color-brand-600: oklch(0.52 0.16 258);
+  --color-brand-700: oklch(0.45 0.15 258);
+}
+
+html {
+  color-scheme: light;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 antialiased;
+}

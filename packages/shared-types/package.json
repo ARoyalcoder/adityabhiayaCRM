@@ -1,0 +1,16 @@
+{
+  "name": "@pawanputra/shared-types",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TypeScript types for the /api/v1 contract, shared by frontend workspaces",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2"
+  }
+}

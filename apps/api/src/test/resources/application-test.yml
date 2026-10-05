@@ -1,0 +1,11 @@
+# Integration tests: the database comes from Testcontainers via @ServiceConnection,
+# so no datasource URL is configured here.
+spring:
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    org.flywaydb: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN

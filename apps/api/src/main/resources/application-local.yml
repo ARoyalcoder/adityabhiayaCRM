@@ -1,0 +1,17 @@
+# Developer machine. Values come from the repository-root .env via scripts/dev-api.sh.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/bos}
+    username: ${DB_USERNAME:bos}
+    password: ${DB_PASSWORD:bos}
+  jpa:
+    show-sql: false
+
+logging:
+  level:
+    com.pawanputra.bos: DEBUG
+    org.flywaydb: INFO
+
+springdoc:
+  swagger-ui:
+    enabled: true

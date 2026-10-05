@@ -1,0 +1,26 @@
+# Local development: infrastructure only.
+# The backend and the Vite dev server run on the host with hot reload
+# (docs/architecture/12-deployment-architecture.md, "Environments").
+name: pawanputra-bos-dev
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bos-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-bos}
+      POSTGRES_USER: ${POSTGRES_USER:-bos}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bos} -d ${POSTGRES_DB:-bos}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -1,0 +1,20 @@
+{
+  "name": "@pawanputra/validation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Zod schemas mirroring backend Bean Validation rules and API responses",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pawanputra/shared-types": "0.1.0",
+    "zod": "^4.3.3"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.2"
+  }
+}

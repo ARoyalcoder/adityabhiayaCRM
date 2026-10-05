@@ -1,0 +1,67 @@
+# Production / staging topology, as described in
+# docs/architecture/12-deployment-architecture.md.
+#
+# Every value comes from the environment file passed with --env-file; no
+# secret is committed. Redis and MinIO are added in the steps that need them.
+name: pawanputra-bos
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?required}
+      POSTGRES_USER: ${POSTGRES_USER:?required}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+    # Not published on the host: only the app container reaches it.
+    expose:
+      - "5432"
+
+  api:
+    image: ${API_IMAGE:?required}
+    build:
+      context: ..
+      dockerfile: docker/api.Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      APP_VERSION: ${APP_VERSION:-0.1.0}
+      DB_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      DB_USERNAME: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      JAVA_TOOL_OPTIONS: ${API_JAVA_OPTS:--XX:MaxRAMPercentage=75}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # Flyway runs during startup, so readiness turns UP only once the
+      # schema is migrated.
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/actuator/health/readiness"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped
+    expose:
+      - "8080"
+
+  web:
+    image: ${WEB_IMAGE:?required}
+    build:
+      context: ..
+      dockerfile: docker/web.Dockerfile
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-80}:80"
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -1,0 +1,25 @@
+# Production. Every value below that is environment-specific or secret comes
+# from environment variables (docs/architecture/12-deployment-architecture.md).
+spring:
+  jpa:
+    show-sql: false
+  datasource:
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:20}
+
+server:
+  shutdown: graceful
+
+logging:
+  structured:
+    format:
+      console: ecs
+  level:
+    root: INFO
+
+springdoc:
+  # No API documentation is served in production.
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

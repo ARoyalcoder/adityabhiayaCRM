@@ -1,0 +1,14 @@
+# Release verification: same images and configuration shape as production,
+# with API documentation left reachable for testers.
+spring:
+  jpa:
+    show-sql: false
+
+logging:
+  structured:
+    format:
+      console: ecs
+
+springdoc:
+  swagger-ui:
+    enabled: true
