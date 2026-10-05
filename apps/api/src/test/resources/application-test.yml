@@ -1,0 +1,16 @@
+# Integration tests. PostgreSQL and Redis come from Testcontainers through
+# @ServiceConnection (support/TestcontainersConfiguration), so no connection
+# settings are configured here.
+spring:
+  jpa:
+    show-sql: false
+
+logging:
+  structured:
+    ecs:
+      service:
+        environment: test
+  level:
+    org.flywaydb: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN
