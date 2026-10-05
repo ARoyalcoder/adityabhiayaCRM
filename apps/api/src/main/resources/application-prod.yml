@@ -12,8 +12,9 @@ server:
 
 logging:
   structured:
-    format:
-      console: ecs
+    ecs:
+      service:
+        environment: prod
   level:
     root: INFO
 

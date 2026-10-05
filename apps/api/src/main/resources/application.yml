@@ -30,6 +30,17 @@ spring:
     validate-on-migrate: true
     # Forward-only: a changed migration file must be a new file.
     clean-disabled: true
+  data:
+    redis:
+      # Cache and short-lived counters only; never the system of record
+      # (docs/architecture/01-system-architecture.md).
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      ssl:
+        enabled: ${REDIS_SSL:false}
+      timeout: 2s
+      connect-timeout: 2s
   jackson:
     default-property-inclusion: non_null
     serialization:
@@ -62,7 +73,18 @@ management:
     health:
       probes:
         enabled: true
+      # Component statuses (UP/DOWN) are listed; their details (hosts,
+      # versions, error messages) never are.
+      show-components: always
       show-details: never
+      group:
+        # Readiness includes the database and Redis, so Docker and Nginx only
+        # send traffic to an instance that can reach both. Liveness does not:
+        # a Redis outage must not get the container restarted.
+        readiness:
+          include: readinessState,db,redis
+        liveness:
+          include: livenessState
   health:
     livenessstate:
       enabled: true
@@ -76,6 +98,18 @@ springdoc:
     path: /api/v1/docs
 
 logging:
+  # Structured JSON (Elastic Common Schema) on stdout in every environment
+  # (docs/architecture/12-deployment-architecture.md). The request id is in the
+  # MDC and appears as the "requestId" field. Set LOG_FORMAT to logstash or
+  # gelf to change the schema.
+  structured:
+    format:
+      console: ${LOG_FORMAT:ecs}
+    ecs:
+      service:
+        name: business-os-api
+        version: ${APP_VERSION:0.1.0-SNAPSHOT}
+        environment: local
   level:
     root: INFO
     com.pawanputra.bos: INFO

@@ -14,6 +14,11 @@ export interface RequestOptions {
   signal?: AbortSignal;
   /** Required for money operations and webhooks (D-06.4). */
   idempotencyKey?: string;
+  /**
+   * Non-2xx statuses whose body is a normal response rather than a Problem
+   * Detail, e.g. 503 from the health endpoint, which still reports components.
+   */
+  acceptStatuses?: readonly number[];
 }
 
 /**
@@ -25,7 +30,7 @@ export async function apiRequest<T>(
   schema: z.ZodType<T>,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = 'GET', body, signal, idempotencyKey } = options;
+  const { method = 'GET', body, signal, idempotencyKey, acceptStatuses = [] } = options;
 
   const headers = new Headers({ Accept: 'application/json' });
   if (body !== undefined) {
@@ -49,7 +54,7 @@ export async function apiRequest<T>(
     throw new ApiError(0, 'The server could not be reached.');
   }
 
-  if (!response.ok) {
+  if (!response.ok && !acceptStatuses.includes(response.status)) {
     throw await toApiError(response);
   }
 

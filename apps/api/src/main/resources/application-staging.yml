@@ -6,8 +6,9 @@ spring:
 
 logging:
   structured:
-    format:
-      console: ecs
+    ecs:
+      service:
+        environment: staging
 
 springdoc:
   swagger-ui:

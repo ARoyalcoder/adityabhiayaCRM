@@ -1,9 +1,15 @@
-# Developer machine. Values come from the repository-root .env via scripts/dev-api.sh.
+# Developer machine. Values come from the repository-root .env via scripts/dev-api.sh;
+# the defaults below match .env.example so the backend also starts from an IDE.
 spring:
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/bos}
     username: ${DB_USERNAME:bos}
-    password: ${DB_PASSWORD:bos}
+    password: ${DB_PASSWORD:change-me-local-only}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:change-me-local-only}
   jpa:
     show-sql: false
 

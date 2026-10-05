@@ -1,20 +1,22 @@
 import { useQuery } from '@tanstack/react-query';
-import { systemInfoSchema } from '@pawanputra/validation';
-import type { SystemInfo } from '@pawanputra/shared-types';
+import { applicationHealthSchema } from '@pawanputra/validation';
+import type { ApplicationHealth } from '@pawanputra/shared-types';
 import { apiRequest } from './client';
 
 export const systemKeys = {
-  info: () => ['system', 'info'] as const,
+  health: () => ['system', 'health'] as const,
 };
 
-export function fetchSystemInfo(signal?: AbortSignal): Promise<SystemInfo> {
-  return apiRequest('/system/info', systemInfoSchema, { signal });
+/** GET /api/v1/health. A 503 still carries the per-component statuses. */
+export function fetchApplicationHealth(signal?: AbortSignal): Promise<ApplicationHealth> {
+  return apiRequest('/health', applicationHealthSchema, { signal, acceptStatuses: [503] });
 }
 
-/** Proves the browser can reach the backend through the same-origin /api path. */
-export function useSystemInfo() {
+/** Proves the browser reaches the backend, and the backend its database and Redis. */
+export function useApplicationHealth() {
   return useQuery({
-    queryKey: systemKeys.info(),
-    queryFn: ({ signal }) => fetchSystemInfo(signal),
+    queryKey: systemKeys.health(),
+    queryFn: ({ signal }) => fetchApplicationHealth(signal),
+    refetchInterval: 30_000,
   });
 }
